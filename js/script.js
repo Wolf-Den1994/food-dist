@@ -149,13 +149,14 @@ window.addEventListener('DOMContentLoaded', () => {
   // class
 
   class MenuCard {
-    constructor(src, alt, title, descr, price, parentSelector) {
+    constructor(src, alt, title, descr, price, parentSelector, ...classes) {
       this.src = src;
       this.alt = alt;
       this.title = title;
       this.descr = descr;
       this.price = price;
       this.parent = document.querySelector(parentSelector);
+      this.classes = classes;
       this.transfer = 27;
       this.changeToUAH();
     }
@@ -166,6 +167,14 @@ window.addEventListener('DOMContentLoaded', () => {
 
     render() {
       const card = document.createElement('div');
+
+      if (!this.classes.length) {
+        this.card = 'menu__item';
+        card.classList.add(this.card);
+      } else {
+        this.classes.forEach((className) => card.classList.add(className));
+      }
+
       card.innerHTML = `
         <div class="menu__item">
           <img src="${this.src}" alt="${this.alt}">
