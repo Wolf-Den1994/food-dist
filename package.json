@@ -12,13 +12,26 @@
   },
   "author": "Den",
   "license": "ISC",
+  "browserslist": [
+    "> 1%"
+  ],
   "bugs": {
     "url": "https://github.com/Wolf-Den1994/food-dist/issues"
   },
   "homepage": "https://github.com/Wolf-Den1994/food-dist#readme",
   "devDependencies": {
+    "@babel/cli": "^7.14.8",
+    "@babel/core": "^7.14.8",
+    "@babel/preset-env": "^7.14.8",
+    "babel-loader": "^8.2.2",
+    "core-js": "^3.15.2",
     "json-server": "^0.16.3",
     "webpack": "^5.46.0",
     "webpack-cli": "^4.7.2"
+  },
+  "dependencies": {
+    "@babel/polyfill": "^7.12.1",
+    "es6-promise": "^4.2.8",
+    "nodelist-foreach-polyfill": "^1.2.0"
   }
 }
