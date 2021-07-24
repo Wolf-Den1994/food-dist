@@ -148,66 +148,83 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // class
 
-  class MenuCard {
-    constructor(src, alt, title, descr, price, parentSelector) {
-      this.src = src;
-      this.alt = alt;
-      this.title = title;
-      this.descr = descr;
-      this.price = price;
-      this.parent = document.querySelector(parentSelector);
-      this.transfer = 27;
-      this.changeToUAH();
-    }
+  // class MenuCard {
+  //   constructor(src, alt, title, descr, price, parentSelector) {
+  //     this.src = src;
+  //     this.alt = alt;
+  //     this.title = title;
+  //     this.descr = descr;
+  //     this.price = price;
+  //     this.parent = document.querySelector(parentSelector);
+  //     this.transfer = 27;
+  //     this.changeToUAH();
+  //   }
 
-    changeToUAH() {
-      this.price = this.price * this.transfer;
-    }
+  //   changeToUAH() {
+  //     this.price = this.price * this.transfer;
+  //   }
 
-    render() {
+  //   render() {
+  //     const card = document.createElement('div');
+  //     card.innerHTML = `
+  //       <div class="menu__item">
+  //         <img src="${this.src}" alt="${this.alt}">
+  //         <h3 class="menu__item-subtitle">${this.title}</h3>
+  //         <div class="menu__item-descr">${this.descr}</div>
+  //         <div class="menu__item-divider"></div>
+  //         <div class="menu__item-price">
+  //           <div class="menu__item-cost">Цена:</div>
+  //           <div class="menu__item-total"><span>${this.price}</span> грн/день</div>
+  //         </div>
+  //       </div>
+  //     `;
+  //     this.parent.append(card);
+  //   }
+  // }
+
+  const getResource = async (url) => {
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`Could not fetch ${url}, status: ${res.status}`);
+    }
+    return await res.json();
+  };
+
+  // getResource('http://localhost:3000/menu').then((data) => {
+  //   data.forEach(({ img, altimg, title, descr, price }) => {
+  //     new MenuCard(
+  //       img,
+  //       altimg,
+  //       title,
+  //       descr,
+  //       price,
+  //       '.menu .container'
+  //     ).render();
+  //   });
+  // });
+
+  getResource('http://localhost:3000/menu').then(data => createCard(data));
+
+  function createCard(data) {
+    data.forEach(({ img, altimg, title, descr, price })=>{
+      price = 27 * price;
       const card = document.createElement('div');
+      card.classList.add('menu__item')
       card.innerHTML = `
         <div class="menu__item">
-          <img src="${this.src}" alt="${this.alt}">
-          <h3 class="menu__item-subtitle">${this.title}</h3>
-          <div class="menu__item-descr">${this.descr}</div>
+          <img src="${img}" alt="${altimg}">
+          <h3 class="menu__item-subtitle">${title}</h3>
+          <div class="menu__item-descr">${descr}</div>
           <div class="menu__item-divider"></div>
           <div class="menu__item-price">
             <div class="menu__item-cost">Цена:</div>
-            <div class="menu__item-total"><span>${this.price}</span> грн/день</div>
+            <div class="menu__item-total"><span>${price}</span> грн/день</div>
           </div>
         </div>
-      `;
-      this.parent.append(card);
-    }
+      `
+      document.querySelector('.menu .container').append(card)
+    })
   }
-
-  new MenuCard(
-    'img/tabs/vegy.jpg',
-    'vegy',
-    'Меню "Фитнес"',
-    'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
-    9,
-    '.menu .container'
-  ).render();
-
-  new MenuCard(
-    'img/tabs/elite.jpg',
-    'elite',
-    'Меню “Премиум”',
-    'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
-    14,
-    '.menu .container'
-  ).render();
-
-  new MenuCard(
-    'img/tabs/post.jpg',
-    'post',
-    'Меню "Постное"',
-    'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
-    21,
-    '.menu .container'
-  ).render();
 
   // Forms
   const forms = document.querySelectorAll('form');
@@ -219,10 +236,21 @@ window.addEventListener('DOMContentLoaded', () => {
   };
 
   forms.forEach((item) => {
-    postData(item);
+    bindPostData(item);
   });
 
-  function postData(form) {
+  const postData = async (url, data) => {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json',
+      },
+      body: data,
+    });
+    return await res.json();
+  };
+
+  function bindPostData(form) {
     form.addEventListener('submit', (e) => {
       e.preventDefault();
 
@@ -238,21 +266,10 @@ window.addEventListener('DOMContentLoaded', () => {
       const formData = new FormData(form);
 
       // в JSON
-      const object = {};
-      formData.forEach((value, key) => {
-        object[key] = value;
-      });
-      const json = JSON.stringify(object);
+      const json = JSON.stringify(Object.fromEntries(formData.entries()));
 
       // request.send(formData)
-      fetch('server1.php', {
-        method: 'POST',
-        headers: {
-          'Content-type': 'application/json',
-        },
-        body: json,
-      })
-        .then((data) => data.text())
+      postData('http://localhost:3000/requests', json)
         .then((data) => {
           console.log(data);
           showThanksModal(message.success);
