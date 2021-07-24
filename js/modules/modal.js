@@ -1,47 +1,58 @@
-function modal() {
-  // modal
-  const btnsOpenModal = document.querySelectorAll('[data-modal]');
-  const bntCloseModal = document.querySelector('[data-close]');
-  const modal = document.querySelector('.modal');
+const closeModal = (modalSelector) => {
+  const modal = document.querySelector(modalSelector);
 
-  const closeModal = () => {
-    modal.classList.remove('show');
-    modal.classList.add('hide');
-    document.body.style.overflow = '';
-  };
+  modal.classList.remove('show');
+  modal.classList.add('hide');
+  document.body.style.overflow = '';
+};
 
-  const openModal = () => {
-    modal.classList.remove('hide');
-    modal.classList.add('show');
-    document.body.style.overflow = 'hidden';
+const openModal = (modalSelector, modalTimerId) => {
+  const modal = document.querySelector(modalSelector);
+
+  modal.classList.remove('hide');
+  modal.classList.add('show');
+  document.body.style.overflow = 'hidden';
+
+  console.log(modalTimerId)
+  if (modalTimerId) {
     clearTimeout(modalTimerId);
-  };
+  }
+};
 
-  const hideModal = (e) => {
-    if (
-      (!modal.classList.contains('hide') && e.target === modal) ||
-      e.target === bntCloseModal ||
-      e.code === 'Escape'
-    ) {
-      closeModal();
-    }
-  };
+const hideModal = (modalSelector, e) => {
+  const modal = document.querySelector(modalSelector);
+  const bntCloseModal = document.querySelector('[data-close]');
 
-  const showModal = () => {
-    if (!modal.classList.contains('show')) {
-      openModal();
-    }
+  if (
+    (!modal.classList.contains('hide') && e.target === modal) ||
+    e.target === bntCloseModal ||
+    e.code === 'Escape'
+  ) {
+    closeModal(modalSelector);
+  }
+};
 
-    // bntCloseModal.addEventListener('click', hideModal);
-    modal.addEventListener('click', hideModal);
-    document.addEventListener('keydown', hideModal);
-  };
+export const showModal = (modalSelector, modalTimerId) => {
+  const modal = document.querySelector(modalSelector);
+
+  if (!modal.classList.contains('show')) {
+    openModal(modalSelector, modalTimerId);
+  }
+
+  // bntCloseModal.addEventListener('click', hideModal);
+  modal.addEventListener('click', hideModal.bind(null, modalSelector));
+  document.addEventListener('keydown', hideModal.bind(null, modalSelector));
+};
+
+function modal(triggerSelector, modalSelector, modalTimerId) {
+  // modal
+  const btnsOpenModal = document.querySelectorAll(triggerSelector);
+  const bntCloseModal = document.querySelector('[data-close]');
+  const modal = document.querySelector(modalSelector);
 
   btnsOpenModal.forEach((btn) => {
-    btn.addEventListener('click', showModal);
+    btn.addEventListener('click', () => showModal(modalSelector, modalTimerId));
   });
-
-  const modalTimerId = setTimeout(showModal, 30000);
 
   const sheckFinalPage = () => {
     if (
@@ -56,4 +67,6 @@ function modal() {
   window.addEventListener('scroll', sheckFinalPage);
 }
 
-module.exports = modal;
+export default modal;
+export { closeModal };
+export { openModal };
