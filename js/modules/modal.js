@@ -13,7 +13,6 @@ const openModal = (modalSelector, modalTimerId) => {
   modal.classList.add('show');
   document.body.style.overflow = 'hidden';
 
-  console.log(modalTimerId)
   if (modalTimerId) {
     clearTimeout(modalTimerId);
   }
@@ -59,7 +58,7 @@ function modal(triggerSelector, modalSelector, modalTimerId) {
       window.pageYOffset + document.documentElement.clientHeight >=
       document.documentElement.scrollHeight
     ) {
-      showModal();
+      showModal('.modal', modalTimerId);
       window.removeEventListener('scroll', sheckFinalPage);
     }
   };
